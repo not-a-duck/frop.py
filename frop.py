@@ -23,9 +23,7 @@ def generate_filename():
 
 parser = ArgumentParser(__file__)
 parser.add_argument(
-    "--pattern",
-    "-p",
-    dest="pattern",
+    "pattern",
     nargs="*",
     help="[OPTIONAL] A pattern to match all files with, by default it matches everything",
 )
@@ -34,18 +32,26 @@ parser.add_argument(
     "--recursive",
     "-r",
     dest="recursive",
-    action="store_true",
+    type=str,
     help="[OPTIONAL] Recurse through all subdirectories from here, or not (on by default)",
 )
 
 parser.set_defaults(
-    recursive=True,
+    recursive="",
 )
 
 args = parser.parse_args()
 
+# We take the first argument of an pseudo-optional list of arguments
 pattern = args.pattern[0] if args.pattern else "*"
-recursive = args.recursive
+
+# Any of these keywords may disable recursion
+recursive = args.recursive.lower() not in [
+    "false",
+    "n",
+    "no",
+    "off",
+]
 
 # NOTE: We could also import tempfile and create the temporary file more
 # idiomatically, but I don't really care for users of other operating systems
