@@ -47,7 +47,10 @@ args = parser.parse_args()
 pattern = args.pattern[0] if args.pattern else "*"
 recursive = args.recursive
 
-# Generate a unique tempfilename
+# NOTE: We could also import tempfile and create the temporary file more
+# idiomatically, but I don't really care for users of other operating systems
+
+# Generate a unique filename for our temporary file
 # do-while
 filepath = generate_filename()
 while filepath.exists():
@@ -70,22 +73,23 @@ f.close()
 # Let some editor edit the filepaths
 run([EDITOR, filepath])
 
+# Now we check what the Rock has been cooking 🍲
 f = open(filepath, "r")
 future_lines = f.read().split("\n")
 f.close()
 
-# Delete tempfile
+# Delete the temporary file, it has served its purpose
 Path(filepath).unlink()
 
 N_CUR = len(current_lines)
 N_FUT = len(future_lines)
 
 if N_CUR > N_FUT:
-    # For zip, it is ok when the number of future lines is greater than, that
-    # simply means the first N_CUR lines will be used for the file action
+    # For zip, it is okay when the number of future lines is greater than the
+    # number of current lines, it simply means the first N_CUR lines will be
+    # used for the filesystem actions
     print(
-        f"The number of lines in the before ({N_CUR})"
-        f"and after ({N_FUT}) are not the same"
+        f"The number of lines in the before ({N_CUR}) and after ({N_FUT}) are too different to continue safely"
     )
     exit(1)
 
